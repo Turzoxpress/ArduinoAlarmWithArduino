@@ -85,14 +85,14 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            //-----------
+        //-----------
 
 
        bluetoothManager = BluetoothManager.getInstance();
 
         connectDevice(PairedList.mainBTAdress);
 
-        mp = MediaPlayer.create(this, R.raw.bell);
+        mp = MediaPlayer.create(this, R.raw.bell2);
 
 
 
