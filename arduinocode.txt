@@ -1,0 +1,169 @@
+
+
+char data = 0; //Variable for storing received data
+
+boolean onOffFlag;
+
+int trigPin = 11;    // Trigger
+int echoPin = 12;    // Echo
+long duration, cm, inches;
+long ditectDistance = 80;
+
+boolean readData = true;
+boolean alertWithAlarm = false;
+
+
+void setup()
+{
+  Serial.begin(9600); //Sets the baud for serial data transmission                               
+  //pinMode(13, OUTPUT); //Sets digital pin 13 as output pin
+  
+  //Define inputs and outputs
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+}
+void loop()
+{
+  
+  if(readData){
+    
+    //----
+    
+     // reading the sensor data
+  readSensorData();
+  
+  if(cm <= ditectDistance){
+      
+      sendAlertData();
+    }
+  
+  
+
+  }
+  
+    
+    //-------------------
+  
+  
+  //--
+  if(Serial.available() > 0)  // Send data only when you receive data:
+  {
+    data = Serial.read();        //Read the  incoming  data and store it into variable data
+    //Serial.print(data);          //Print Value inside data in Serial monitor
+    //Serial.print("\n");          //New line
+    
+    if(data == '1'){
+      
+      readData = true;
+       //Serial.print("System turned on");
+  Serial.print(ditectDistance);
+  Serial.print(",");
+  Serial.print(cm);
+  Serial.print(",");
+  Serial.print(alertWithAlarm);
+  Serial.print(",");
+  Serial.print("1");
+  Serial.println();
+      
+    }else if(data == '0'){
+      
+      readData = false;
+       //Serial.print("System turned off");
+       
+        Serial.print(ditectDistance);
+  Serial.print(",");
+  Serial.print(cm);
+  Serial.print(",");
+  Serial.print(alertWithAlarm);
+  Serial.print(",");
+  Serial.print("0");
+  Serial.println();
+      
+      
+    }else if(data == 'i'){
+      
+      ditectDistance = ditectDistance + 10;
+      //Serial.print("New Distance is ");
+      //Serial.print(ditectDistance);
+      
+      
+    }else if(data == 'd'){
+      
+       ditectDistance = ditectDistance - 10;
+       //Serial.print("New Distance is ");
+       //Serial.print(ditectDistance);
+    }
+  }
+  
+  
+  
+  //-----------------
+ 
+  
+}
+
+void sendAlertData(){
+  
+  //Serial.print("alarm is on");
+  alertWithAlarm = true;
+  readData = false;
+  
+ //--
+  Serial.print(ditectDistance);
+  Serial.print(",");
+  Serial.print(cm);
+  Serial.print(",");
+  Serial.print(alertWithAlarm);
+  Serial.print(",");
+  Serial.print("0");
+  Serial.println();
+
+  alertWithAlarm = false;
+
+//---------- 
+  delay(10000);
+  
+  readData = true;
+  
+  
+}
+
+void readSensorData(){
+  
+   // The sensor is triggered by a HIGH pulse of 10 or more microseconds.
+  // Give a short LOW pulse beforehand to ensure a clean HIGH pulse:
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+ 
+  // Read the signal from the sensor: a HIGH pulse whose
+  // duration is the time (in microseconds) from the sending
+  // of the ping to the reception of its echo off of an object.
+  pinMode(echoPin, INPUT);
+  duration = pulseIn(echoPin, HIGH);
+ 
+  // Convert the time into a distance
+  cm = (duration/2) / 29.1;     // Divide by 29.1 or multiply by 0.0343
+  inches = (duration/2) / 74;   // Divide by 74 or multiply by 0.0135
+  
+  /*
+  Serial.print(inches);
+  Serial.print("in, ");
+  Serial.print(cm);
+  Serial.print("cm");
+  Serial.println();
+  */
+  Serial.print(ditectDistance);
+  Serial.print(",");
+  Serial.print(cm);
+  Serial.print(",");
+  Serial.print(alertWithAlarm);
+  Serial.print(",");
+  Serial.print("1");
+  Serial.println();
+  
+  delay(250);
+}
